@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Load Prediction & Optimization System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                🤖 AI Load Prediction & Optimization System
+            </span>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <div class="col-md-2">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <button class="nav-link active" id="v-pills-upload-tab" data-bs-toggle="pill" data-bs-target="#v-pills-upload" type="button" role="tab">
+                        📤 Upload Data
+                    </button>
+                    <button class="nav-link" id="v-pills-eda-tab" data-bs-toggle="pill" data-bs-target="#v-pills-eda" type="button" role="tab">
+                        📊 EDA
+                    </button>
+                    <button class="nav-link" id="v-pills-preprocess-tab" data-bs-toggle="pill" data-bs-target="#v-pills-preprocess" type="button" role="tab">
+                        🔧 Preprocessing
+                    </button>
+                    <button class="nav-link" id="v-pills-train-tab" data-bs-toggle="pill" data-bs-target="#v-pills-train" type="button" role="tab">
+                        🧠 Train Model
+                    </button>
+                    <button class="nav-link" id="v-pills-predict-tab" data-bs-toggle="pill" data-bs-target="#v-pills-predict" type="button" role="tab">
+                        📈 Predictions
+                    </button>
+                    <button class="nav-link" id="v-pills-anomaly-tab" data-bs-toggle="pill" data-bs-target="#v-pills-anomaly" type="button" role="tab">
+                        ⚠️ Anomalies
+                    </button>
+                    <button class="nav-link" id="v-pills-optimize-tab" data-bs-toggle="pill" data-bs-target="#v-pills-optimize" type="button" role="tab">
+                        ⚡ Optimization
+                    </button>
+                    <button class="nav-link" id="v-pills-about-tab" data-bs-toggle="pill" data-bs-target="#v-pills-about" type="button" role="tab">
+                        ℹ️ About
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10">
+                <div class="tab-content" id="v-pills-tabContent">
+
+                    <!-- Upload Section -->
+                    <div class="tab-pane fade show active" id="v-pills-upload" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="mb-0">📤 Upload Dataset</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="fileInput" class="form-label">Select CSV File:</label>
+                                    <input class="form-control form-control-lg" type="file" id="fileInput" accept=".csv" onchange="if(this.files.length) uploadFile()">
+                                </div>
+                                <button class="btn btn-primary btn-lg" onclick="uploadFile()">Upload & Load</button>
+                                <button class="btn btn-danger btn-lg" onclick="resetSystem()">Reset System</button>
+                            </div>
+                        </div>
+
+                        <div id="uploadResult" class="mt-3"></div>
+                        
+                        <div class="card mt-3">
+                            <div class="card-header">Data Preview</div>
+                            <div class="card-body" id="dataPreviewContainer">
+                                <p class="text-muted">Load data to see preview...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EDA Section -->
+                    <div class="tab-pane fade" id="v-pills-eda" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h4 class="mb-0">📊 Exploratory Data Analysis</h4>
+                            </div>
+                            <div class="card-body">
+                                <button class="btn btn-success btn-lg" onclick="performEDA()">Run EDA</button>
+                            </div>
+                        </div>
+
+                        <div id="edaResult" class="mt-3"></div>
+                    </div>
+
+                    <!-- Preprocessing Section -->
+                    <div class="tab-pane fade" id="v-pills-preprocess" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h4 class="mb-0">🔧 Data Preprocessing</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>Preprocessing includes:</p>
+                                <ul>
+                                    <li>Handle missing values (mean imputation)</li>
+                                    <li>Remove outliers (IQR method)</li>
+                                    <li>Feature engineering (rolling averages, lag features)</li>
+                                    <li>Feature normalization (StandardScaler)</li>
+                                </ul>
+                                <button class="btn btn-info btn-lg" onclick="preprocess()">Run Preprocessing</button>
+                            </div>
+                        </div>
+
+                        <div id="preprocessResult" class="mt-3"></div>
+                    </div>
+
+                    <!-- Model Training Section -->
+                    <div class="tab-pane fade" id="v-pills-train" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header bg-warning text-dark">
+                                <h4 class="mb-0">🧠 Train ML Model</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>Training a <strong>Random Forest Regressor</strong> to predict CPU utilization</p>
+                                <button class="btn btn-warning btn-lg" onclick="trainModel()">Train Model</button>
+                            </div>
+                        </div>
+
+                        <div id="trainResult" class="mt-3"></div>
+                    </div>
+
+                    <!-- Predictions Section -->
+                    <div class="tab-pane fade" id="v-pills-predict" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                <h4 class="mb-0">📈 Load Predictions</h4>
+                            </div>
+                            <div class="card-body">
+                                <button class="btn btn-secondary btn-lg" onclick="makePredictions()">Make Predictions</button>
+                            </div>
+                        </div>
+
+                        <div id="predictResult" class="mt-3"></div>
+                    </div>
+
+                    <!-- Anomaly Detection Section -->
+                    <div class="tab-pane fade" id="v-pills-anomaly" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header bg-danger text-white">
+                                <h4 class="mb-0">⚠️ Anomaly Detection</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>Detecting anomalies using <strong>Isolation Forest</strong> algorithm</p>
+                                <button class="btn btn-danger btn-lg" onclick="detectAnomalies()">Detect Anomalies</button>
+                            </div>
+                        </div>
+
+                        <div id="anomalyResult" class="mt-3"></div>
+                    </div>
+
+                    <!-- Optimization Section -->
+                    <div class="tab-pane fade" id="v-pills-optimize" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header bg-secondary text-white">
+                                <h4 class="mb-0">⚡ Resource Optimization</h4>
+                            </div>
+                            <div class="card-body">
+                                <p>Optimization includes:</p>
+                                <ul>
+                                    <li><strong>Hill Climbing Algorithm</strong> - Minimize power consumption</li>
+                                    <li><strong>CSP Scheduling</strong> - Constraint satisfaction for task scheduling</li>
+                                </ul>
+                                <button class="btn btn-success btn-lg" onclick="runOptimization()">Run Optimization</button>
+                            </div>
+                        </div>
+
+                        <div id="optimizeResult" class="mt-3"></div>
+                    </div>
+
+                    <!-- About Section -->
+                    <div class="tab-pane fade" id="v-pills-about" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header bg-dark text-white">
+                                <h4 class="mb-0">ℹ️ About This System</h4>
+                            </div>
+                            <div class="card-body">
+                                <h5>AI-Based Load Prediction and Optimization System</h5>
+                                <p>This system provides a comprehensive solution for:</p>
+                                <ul>
+                                    <li><strong>Data Analysis:</strong> Exploratory data analysis with visualizations</li>
+                                    <li><strong>Preprocessing:</strong> Handling missing values, outliers, and feature engineering</li>
+                                    <li><strong>Prediction:</strong> Random Forest model for CPU load prediction</li>
+                                    <li><strong>Anomaly Detection:</strong> Isolation Forest for detecting abnormal patterns</li>
+                                    <li><strong>Optimization:</strong> Hill Climbing algorithm + CSP-based scheduling</li>
+                                </ul>
+                                
+                                <h5 class="mt-4">Key Features:</h5>
+                                <ul>
+                                    <li>Works with first 1000 rows of dataset for efficiency</li>
+                                    <li>Multiple visualization types (distributions, correlations, time series)</li>
+                                    <li>Comprehensive metrics and reports</li>
+                                    <li>Easy-to-use web interface</li>
+                                </ul>
+
+                                <h5 class="mt-4">Technologies Used:</h5>
+                                <ul>
+                                    <li>Python, Flask (Web Framework)</li>
+                                    <li>Scikit-learn (ML Library)</li>
+                                    <li>Pandas, NumPy (Data Processing)</li>
+                                    <li>Matplotlib, Seaborn (Visualization)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="spinner-container" style="display: none;">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+    <script>
+        // Initialize Bootstrap tooltips and popovers
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
+        });
+    </script>
+</body>
+</html>

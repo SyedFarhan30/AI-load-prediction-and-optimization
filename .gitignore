@@ -1,0 +1,45 @@
+# Documentation files
+*.md
+QUICK_REFERENCE.txt
+
+# # Data files
+# *.csv
+# Big_data_dataset.csv
+
+# Test and demo files
+test_modules.py
+demo.py
+
+# Runtime and upload directories
+uploads/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Distribution files
+build/
+dist/
+*.egg-info/
