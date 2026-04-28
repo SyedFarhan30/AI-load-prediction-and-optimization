@@ -28,6 +28,9 @@ class DataPreprocessor:
         self.df_processed = None
         self.scaler = StandardScaler()
         self.feature_cols = []
+        self.scale_cols = []
+        self.scaler_method = None
+        self.minmax_scaler = None
 
     # ------------------------------------------------------------------
     def load_data(self):
@@ -177,18 +180,58 @@ class DataPreprocessor:
             c for c in df_copy.select_dtypes(include=[np.number]).columns
             if c not in skip_cols
         ]
+        self.scale_cols = list(scale_cols)
+        self.scaler_method = method
 
         if method == 'standard':
             df_copy[scale_cols] = self.scaler.fit_transform(df_copy[scale_cols])
+            self.minmax_scaler = None
             print("✓ Features normalized using StandardScaler")
         elif method == 'minmax':
             scaler = MinMaxScaler()
             df_copy[scale_cols] = scaler.fit_transform(df_copy[scale_cols])
+            self.minmax_scaler = scaler
             print("✓ Features normalized using MinMaxScaler")
         else:
             raise ValueError(f"Unknown method '{method}'. Choose 'standard' or 'minmax'.")
 
         self.df_processed = df_copy
+        return df_copy
+
+    # ------------------------------------------------------------------
+    def inverse_transform_column(self, values, column_name):
+        """Inverse-transform a scaled numeric column back to original units."""
+        arr = np.asarray(values, dtype=float)
+
+        if (
+            self.scaler_method is None
+            or column_name not in self.scale_cols
+            or len(self.scale_cols) == 0
+        ):
+            return arr
+
+        col_idx = self.scale_cols.index(column_name)
+
+        if self.scaler_method == 'standard':
+            return arr * self.scaler.scale_[col_idx] + self.scaler.mean_[col_idx]
+
+        if self.scaler_method == 'minmax' and self.minmax_scaler is not None:
+            scale = self.minmax_scaler.scale_[col_idx]
+            min_ = self.minmax_scaler.min_[col_idx]
+            return (arr - min_) / (scale + 1e-12)
+
+        return arr
+
+    # ------------------------------------------------------------------
+    def inverse_transform_dataframe(self, df, columns=None):
+        """Inverse-transform selected columns of a processed dataframe."""
+        df_copy = df.copy()
+        target_cols = columns if columns is not None else list(self.scale_cols)
+
+        for col in target_cols:
+            if col in df_copy.columns:
+                df_copy[col] = self.inverse_transform_column(df_copy[col].values, col)
+
         return df_copy
 
     # ------------------------------------------------------------------
