@@ -8,7 +8,7 @@
 
 ### Step 1: Install Python Packages
 ```bash
-cd "e:\D drive\SE\project"
+
 pip install -r requirements.txt
 ```
 
